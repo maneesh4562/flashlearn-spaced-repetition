@@ -1,11 +1,18 @@
 import { Flame } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-let streakState = 0;
-
 export function incrementStreak() {
-  streakState += 1;
-  localStorage.setItem('streak', streakState.toString());
+  // Read current streak, increment, and save
+  const currentStreak = parseInt(localStorage.getItem('streak') || '0', 10);
+  const newStreak = currentStreak + 1;
+  localStorage.setItem('streak', newStreak.toString());
+  
+  // Dispatch a storage event to notify other parts of the app (including the component)
+  window.dispatchEvent(new StorageEvent('storage', {
+    key: 'streak',
+    newValue: newStreak.toString(),
+    oldValue: currentStreak.toString(),
+  }));
 }
 
 export default function StreakCounter() {
@@ -15,8 +22,20 @@ export default function StreakCounter() {
   });
 
   useEffect(() => {
-    localStorage.setItem('streak', streak.toString());
-  }, [streak]);
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'streak' && event.newValue !== null) {
+        setStreak(parseInt(event.newValue, 10));
+      }
+    };
+
+    // Listen for storage changes
+    window.addEventListener('storage', handleStorageChange);
+
+    // Clean up the event listener
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []); // Empty dependency array means this effect runs once on mount and cleans up on unmount
 
   return (
     <div className="flex items-center gap-1 text-orange-500">

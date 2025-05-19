@@ -78,7 +78,7 @@ export default function CardModal({
             >
               <X size={18} />
             </motion.button>
-            <h3 className="text-xl font-semibold mb-6 text-zinc-900 dark:text-zinc-100 pr-10">
+            <h3 className="text-xl font-semibold mt-10  text-zinc-900 dark:text-zinc-100 m-[50px] pr-10" >
               {mode === 'add' ? 'Add New Card' : 'Edit Card'}
             </h3>
             <form onSubmit={handleSubmit} className="space-y-6">
